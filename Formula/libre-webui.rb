@@ -17,11 +17,20 @@ class LibreWebui < Formula
   head "https://github.com/libre-webui/libre-webui.git", branch: "main"
 
   depends_on "node@20"
-  depends_on "python@3.12" => :build
+  depends_on "python-setuptools" => :build
 
   def install
-    # Install dependencies (allow scripts for native modules like better-sqlite3)
+    # Set up environment for native module compilation
+    ENV.prepend_path "PATH", Formula["node@20"].opt_bin
+
+    # Install dependencies and build native modules
     system "npm", "install", "--legacy-peer-deps"
+
+    # Explicitly rebuild native modules
+    system "npm", "rebuild", "better-sqlite3"
+    system "npm", "rebuild", "bcrypt"
+
+    # Build the app
     system "npm", "run", "build"
 
     # Install the package to libexec
