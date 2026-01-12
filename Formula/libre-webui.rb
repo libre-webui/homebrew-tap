@@ -17,9 +17,11 @@ class LibreWebui < Formula
   head "https://github.com/libre-webui/libre-webui.git", branch: "main"
 
   depends_on "node@20"
+  depends_on "python@3.12" => :build
 
   def install
-    system "npm", "install", "--ignore-scripts", "--legacy-peer-deps"
+    # Install dependencies (allow scripts for native modules like better-sqlite3)
+    system "npm", "install", "--legacy-peer-deps"
     system "npm", "run", "build"
 
     # Install the package to libexec
