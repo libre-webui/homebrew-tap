@@ -64,6 +64,7 @@ test("keeps the CLI and desktop packages on distinct tokens", () => {
   assert.match(formula, /^class LibreWebui < Formula/m);
   assert.match(cask, /^cask "libre-webui-frontend" do/m);
   assert.doesNotMatch(cask, /^cask "libre-webui" do/m);
+  assert.match(cask, /brew install --formula libre-webui/);
   assert.equal(renames["libre-webui"], "libre-webui-frontend");
   assert.equal(
     fs.existsSync(path.join(repoRoot, "Casks/libre-webui.rb")),

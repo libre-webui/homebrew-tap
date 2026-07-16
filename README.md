@@ -6,7 +6,7 @@ Official Homebrew formula and cask for [Libre WebUI](https://librewebui.org).
 
 ```bash
 brew tap libre-webui/tap
-brew install libre-webui
+brew install --formula libre-webui
 ```
 
 Start Libre WebUI:
@@ -38,7 +38,7 @@ automatically to `libre-webui-frontend`.
 
 ```bash
 brew update
-brew upgrade libre-webui
+brew upgrade --formula libre-webui
 brew upgrade --cask libre-webui-frontend
 ```
 
