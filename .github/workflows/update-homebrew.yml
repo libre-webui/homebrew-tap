@@ -1,0 +1,102 @@
+name: Update Homebrew packages
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Stable version to publish (defaults to npm latest)"
+        required: false
+        type: string
+      force:
+        description: "Recalculate checksums for the current version"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: homebrew-package-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: macos-latest
+    env:
+      GITLAB_TAP_TOKEN: ${{ secrets.GITLAB_TAP_TOKEN }}
+
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Test updater
+        run: node --test .github/scripts/update-homebrew.test.mjs
+
+      - name: Update formula and cask
+        env:
+          FORCE_UPDATE: ${{ inputs.force }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          ARGS=()
+          if [ -n "$REQUESTED_VERSION" ]; then
+            ARGS+=(--version "$REQUESTED_VERSION")
+          fi
+          if [ "$FORCE_UPDATE" = "true" ]; then
+            ARGS+=(--force)
+          fi
+          node .github/scripts/update-homebrew.mjs "${ARGS[@]}"
+
+      - name: Validate Ruby and style
+        run: |
+          ruby -c Formula/libre-webui.rb
+          ruby -c Casks/libre-webui.rb
+          brew style Formula/libre-webui.rb Casks/libre-webui.rb
+
+      - name: Detect changes
+        id: changes
+        run: |
+          if git diff --quiet -- Formula/libre-webui.rb Casks/libre-webui.rb; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit candidate update
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          VERSION=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/libre-webui.rb)
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add Formula/libre-webui.rb Casks/libre-webui.rb
+          git commit -m "Update to v$VERSION"
+
+      - name: Run strict Homebrew validation
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          brew tap --custom-remote libre-webui/tap "file://$GITHUB_WORKSPACE"
+          brew trust libre-webui/tap
+          brew audit --strict --online --formula libre-webui/tap/libre-webui
+          brew audit --strict --online --cask libre-webui/tap/libre-webui
+          brew livecheck --formula libre-webui/tap/libre-webui
+          brew livecheck --cask libre-webui/tap/libre-webui
+
+      - name: Push GitLab mirror
+        if: steps.changes.outputs.changed == 'true' && env.GITLAB_TAP_TOKEN != ''
+        run: |
+          git remote add gitlab "https://oauth2:${GITLAB_TAP_TOKEN}@git.kroonen.ai/libre-webui/homebrew-tap.git"
+          git push gitlab HEAD:master
+
+      - name: Push GitHub tap
+        if: steps.changes.outputs.changed == 'true'
+        run: git push origin HEAD:master
