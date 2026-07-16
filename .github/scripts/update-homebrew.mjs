@@ -129,7 +129,7 @@ async function main() {
     : await resolveLatestVersion();
 
   const formulaPath = path.join(repoRoot, "Formula/libre-webui.rb");
-  const caskPath = path.join(repoRoot, "Casks/libre-webui.rb");
+  const caskPath = path.join(repoRoot, "Casks/libre-webui-frontend.rb");
   const formula = fs.readFileSync(formulaPath, "utf8");
   const cask = fs.readFileSync(caskPath, "utf8");
   const currentVersion = cask.match(/version "([^"]+)"/)?.[1];
