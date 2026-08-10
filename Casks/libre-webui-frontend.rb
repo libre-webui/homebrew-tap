@@ -9,8 +9,8 @@
 #   brew install --cask libre-webui/tap/libre-webui-frontend
 
 cask "libre-webui-frontend" do
-  version "0.21.2"
-  sha256 "caf5faaaf5cb0879020f793f645729f97316fe24342e4f0d2e4831072da6c6b5"
+  version "0.21.3"
+  sha256 "b1b79540fa22d2f6a281f1896e9745b32155ba95ec0bd53be13c8120b73e7c75"
 
   url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Frontend-#{version}-mac-arm64.dmg",
       verified: "github.com/libre-webui/libre-webui/"
