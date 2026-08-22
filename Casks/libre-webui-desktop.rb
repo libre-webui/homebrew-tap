@@ -3,18 +3,21 @@
 #
 # Installation:
 #   brew tap libre-webui/tap
-#   brew install --cask libre-webui-frontend
+#   brew install --cask libre-webui-desktop
 #
 # Or install directly:
-#   brew install --cask libre-webui/tap/libre-webui-frontend
+#   brew install --cask libre-webui/tap/libre-webui-desktop
 
-cask "libre-webui-frontend" do
+cask "libre-webui-desktop" do
   version "0.26.0"
   sha256 "cf23558b5b70a8966434511de1d9dc1cdb4f5b4d4ce7124db5132814355f8a5a"
 
+  # Releases up to 0.26.0 predate the rename to "Libre WebUI Desktop" and
+  # ship assets under the old "Frontend" name; the hourly updater rewrites
+  # the download and app stanzas to match whatever the release contains.
   url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Frontend-#{version}-mac-arm64.dmg",
       verified: "github.com/libre-webui/libre-webui/"
-  name "Libre WebUI Frontend"
+  name "Libre WebUI Desktop"
   desc "Open, self-hosted workspace for creating with AI"
   homepage "https://librewebui.org/"
 
@@ -30,6 +33,7 @@ cask "libre-webui-frontend" do
 
   zap trash: [
     "~/.libre-webui",
+    "~/Library/Application Support/Libre WebUI Desktop",
     "~/Library/Application Support/Libre WebUI Frontend",
     "~/Library/Application Support/libre-webui",
     "~/Library/Caches/com.librewebui.app",
@@ -39,7 +43,7 @@ cask "libre-webui-frontend" do
   ]
 
   caveats <<~EOS
-    Libre WebUI Frontend connects to a Libre WebUI backend on port 3001.
+    Libre WebUI Desktop connects to a Libre WebUI backend on port 3001.
     Install and start the backend with:
       brew install --formula libre-webui
       libre-webui --port 3001

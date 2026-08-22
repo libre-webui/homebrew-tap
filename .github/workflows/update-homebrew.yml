@@ -60,13 +60,13 @@ jobs:
       - name: Validate Ruby and style
         run: |
           ruby -c Formula/libre-webui.rb
-          ruby -c Casks/libre-webui-frontend.rb
-          brew style Formula/libre-webui.rb Casks/libre-webui-frontend.rb
+          ruby -c Casks/libre-webui-desktop.rb
+          brew style Formula/libre-webui.rb Casks/libre-webui-desktop.rb
 
       - name: Detect changes
         id: changes
         run: |
-          if git diff --quiet -- Formula/libre-webui.rb Casks/libre-webui-frontend.rb; then
+          if git diff --quiet -- Formula/libre-webui.rb Casks/libre-webui-desktop.rb; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -75,10 +75,10 @@ jobs:
       - name: Commit candidate update
         if: steps.changes.outputs.changed == 'true'
         run: |
-          VERSION=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/libre-webui-frontend.rb)
+          VERSION=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/libre-webui-desktop.rb)
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add Formula/libre-webui.rb Casks/libre-webui-frontend.rb
+          git add Formula/libre-webui.rb Casks/libre-webui-desktop.rb
           git commit -m "Update to v$VERSION"
 
       - name: Run strict Homebrew validation
@@ -87,9 +87,9 @@ jobs:
           brew tap --custom-remote libre-webui/tap "file://$GITHUB_WORKSPACE"
           brew trust libre-webui/tap
           brew audit --strict --online --formula libre-webui/tap/libre-webui
-          brew audit --strict --online --cask libre-webui/tap/libre-webui-frontend
+          brew audit --strict --online --cask libre-webui/tap/libre-webui-desktop
           brew livecheck --formula libre-webui/tap/libre-webui
-          brew livecheck --cask libre-webui/tap/libre-webui-frontend
+          brew livecheck --cask libre-webui/tap/libre-webui-desktop
 
       - name: Push GitLab mirror
         if: steps.changes.outputs.changed == 'true' && env.GITLAB_TAP_TOKEN != ''

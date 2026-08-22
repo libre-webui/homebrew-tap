@@ -1,3 +1,4 @@
 {
-  "libre-webui": "libre-webui-frontend"
+  "libre-webui": "libre-webui-desktop",
+  "libre-webui-frontend": "libre-webui-desktop"
 }

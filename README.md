@@ -15,31 +15,31 @@ Start Libre WebUI:
 libre-webui
 ```
 
-## Install the macOS desktop frontend
+## Install the macOS desktop app
 
 The desktop application currently supports Apple silicon Macs.
 
 ```bash
 brew tap libre-webui/tap
-brew install --cask libre-webui-frontend
+brew install --cask libre-webui-desktop
 ```
 
-The desktop frontend connects to a Libre WebUI backend on port `3001`. Start
+The desktop app connects to a Libre WebUI backend on port `3001`. Start
 one with:
 
 ```bash
 libre-webui --port 3001
 ```
 
-Existing installs using the former `libre-webui` cask token migrate
-automatically to `libre-webui-frontend`.
+Existing installs using the former `libre-webui` or `libre-webui-frontend`
+cask tokens migrate automatically to `libre-webui-desktop`.
 
 ## Update
 
 ```bash
 brew update
 brew upgrade --formula libre-webui
-brew upgrade --cask libre-webui-frontend
+brew upgrade --cask libre-webui-desktop
 ```
 
 [Website](https://librewebui.org) · [Documentation](https://docs.librewebui.org) · [Source](https://github.com/libre-webui/libre-webui)

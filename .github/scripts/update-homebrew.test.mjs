@@ -35,7 +35,7 @@ end
 });
 
 test("updates only the cask version and checksum", () => {
-  const cask = `cask "libre-webui-frontend" do
+  const cask = `cask "libre-webui-desktop" do
   version "0.14.1"
   sha256 "${"a".repeat(64)}"
 end
@@ -43,9 +43,33 @@ end
 
   const updated = updateCask(cask, "0.15.0", "b".repeat(64));
 
-  assert.match(updated, /^cask "libre-webui-frontend" do/m);
+  assert.match(updated, /^cask "libre-webui-desktop" do/m);
   assert.match(updated, /version "0\.15\.0"/);
   assert.match(updated, new RegExp(`sha256 "${"b".repeat(64)}"`));
+});
+
+test("switches the cask to the renamed desktop assets when they ship", () => {
+  const cask = `cask "libre-webui-desktop" do
+  version "0.26.0"
+  sha256 "${"a".repeat(64)}"
+
+  url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Frontend-#{version}-mac-arm64.dmg"
+
+  app "Libre WebUI Frontend.app"
+end
+`;
+
+  const updated = updateCask(cask, "0.27.0", "b".repeat(64), "Desktop");
+
+  assert.match(updated, /Libre-WebUI-Desktop-#\{version\}-mac-arm64\.dmg/);
+  assert.match(updated, /app "Libre WebUI Desktop\.app"/);
+  assert.doesNotMatch(updated, /Libre-WebUI-Frontend/);
+
+  // Pinning back to a pre-rename release restores the old asset names.
+  const reverted = updateCask(updated, "0.26.0", "a".repeat(64), "Frontend");
+
+  assert.match(reverted, /Libre-WebUI-Frontend-#\{version\}-mac-arm64\.dmg/);
+  assert.match(reverted, /app "Libre WebUI Frontend\.app"/);
 });
 
 test("keeps the CLI and desktop packages on distinct tokens", () => {
@@ -54,7 +78,7 @@ test("keeps the CLI and desktop packages on distinct tokens", () => {
     "utf8",
   );
   const cask = fs.readFileSync(
-    path.join(repoRoot, "Casks/libre-webui-frontend.rb"),
+    path.join(repoRoot, "Casks/libre-webui-desktop.rb"),
     "utf8",
   );
   const renames = JSON.parse(
@@ -62,12 +86,18 @@ test("keeps the CLI and desktop packages on distinct tokens", () => {
   );
 
   assert.match(formula, /^class LibreWebui < Formula/m);
-  assert.match(cask, /^cask "libre-webui-frontend" do/m);
+  assert.match(cask, /^cask "libre-webui-desktop" do/m);
   assert.doesNotMatch(cask, /^cask "libre-webui" do/m);
+  assert.doesNotMatch(cask, /^cask "libre-webui-frontend" do/m);
   assert.match(cask, /brew install --formula libre-webui/);
-  assert.equal(renames["libre-webui"], "libre-webui-frontend");
+  assert.equal(renames["libre-webui"], "libre-webui-desktop");
+  assert.equal(renames["libre-webui-frontend"], "libre-webui-desktop");
   assert.equal(
     fs.existsSync(path.join(repoRoot, "Casks/libre-webui.rb")),
+    false,
+  );
+  assert.equal(
+    fs.existsSync(path.join(repoRoot, "Casks/libre-webui-frontend.rb")),
     false,
   );
 });
