@@ -9,13 +9,13 @@
 #   brew install --cask libre-webui/tap/libre-webui-desktop
 
 cask "libre-webui-desktop" do
-  version "0.26.0"
-  sha256 "cf23558b5b70a8966434511de1d9dc1cdb4f5b4d4ce7124db5132814355f8a5a"
+  version "0.27.0"
+  sha256 "97dbd82a0e8c68726281f87b9dc5e43cc6470765f16674e874425ba4add3defc"
 
   # Releases up to 0.26.0 predate the rename to "Libre WebUI Desktop" and
   # ship assets under the old "Frontend" name; the hourly updater rewrites
   # the download and app stanzas to match whatever the release contains.
-  url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Frontend-#{version}-mac-arm64.dmg",
+  url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Desktop-#{version}-mac-arm64.dmg",
       verified: "github.com/libre-webui/libre-webui/"
   name "Libre WebUI Desktop"
   desc "Open, self-hosted workspace for creating with AI"
@@ -29,7 +29,7 @@ cask "libre-webui-desktop" do
   depends_on arch: :arm64
   depends_on macos: :monterey
 
-  app "Libre WebUI Frontend.app"
+  app "Libre WebUI Desktop.app"
 
   zap trash: [
     "~/.libre-webui",
