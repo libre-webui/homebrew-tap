@@ -25,16 +25,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Nearly every scheduled run finds no new version. That path needs no
-  # macOS: the updater is plain Node, and Ruby syntax checks run anywhere.
-  # Apple minutes are spent below only when something actually changed.
-  check:
+  # Linux only: macOS runners bill at 10x and nothing in the update path
+  # needs one — the updater is plain Node and ruby -c runs anywhere. The
+  # strict brew audit/livecheck pass (macOS-only for casks) is a manual
+  # pre-release step, not automation.
+  update:
     runs-on: ubuntu-latest
-    outputs:
-      changed: ${{ steps.changes.outputs.changed }}
+    env:
+      GITLAB_TAP_TOKEN: ${{ secrets.GITLAB_TAP_TOKEN }}
     steps:
       - name: Checkout tap
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -73,42 +76,8 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Upload updated packages
+      - name: Commit update
         if: steps.changes.outputs.changed == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: updated-packages
-          path: |
-            Formula/libre-webui.rb
-            Casks/libre-webui-desktop.rb
-
-  # Strict Homebrew validation needs real brew (cask audit and livecheck
-  # are macOS-only), so this job stays on Apple hardware — but it runs only
-  # for a genuine version change, not two dozen no-op polls a day.
-  publish:
-    needs: check
-    if: needs.check.outputs.changed == 'true'
-    runs-on: macos-latest
-    env:
-      GITLAB_TAP_TOKEN: ${{ secrets.GITLAB_TAP_TOKEN }}
-    steps:
-      - name: Checkout tap
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Download updated packages
-        uses: actions/download-artifact@v4
-        with:
-          name: updated-packages
-
-      - name: Validate Ruby and style
-        run: |
-          ruby -c Formula/libre-webui.rb
-          ruby -c Casks/libre-webui-desktop.rb
-          brew style Formula/libre-webui.rb Casks/libre-webui-desktop.rb
-
-      - name: Commit candidate update
         run: |
           VERSION=$(sed -n 's/^  version "\(.*\)"/\1/p' Casks/libre-webui-desktop.rb)
           git config user.name "GitHub Action"
@@ -116,20 +85,12 @@ jobs:
           git add Formula/libre-webui.rb Casks/libre-webui-desktop.rb
           git commit -m "Update to v$VERSION"
 
-      - name: Run strict Homebrew validation
-        run: |
-          brew tap --custom-remote libre-webui/tap "file://$GITHUB_WORKSPACE"
-          brew trust libre-webui/tap
-          brew audit --strict --online --formula libre-webui/tap/libre-webui
-          brew audit --strict --online --cask libre-webui/tap/libre-webui-desktop
-          brew livecheck --formula libre-webui/tap/libre-webui
-          brew livecheck --cask libre-webui/tap/libre-webui-desktop
-
       - name: Push GitLab mirror
-        if: env.GITLAB_TAP_TOKEN != ''
+        if: steps.changes.outputs.changed == 'true' && env.GITLAB_TAP_TOKEN != ''
         run: |
           git remote add gitlab "https://oauth2:${GITLAB_TAP_TOKEN}@git.kroonen.ai/libre-webui/homebrew-tap.git"
           git push gitlab HEAD:master
 
       - name: Push GitHub tap
+        if: steps.changes.outputs.changed == 'true'
         run: git push origin HEAD:master
