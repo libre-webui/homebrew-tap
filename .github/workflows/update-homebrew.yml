@@ -2,9 +2,9 @@ name: Update Homebrew packages
 
 on:
   schedule:
-    # A backstop only — releases dispatch this workflow directly, so a
-    # six-hour poll is plenty.
-    - cron: "17 */6 * * *"
+    # Once a day, as a backstop only — releases dispatch this workflow
+    # directly, so the schedule never needs to be the fast path.
+    - cron: "17 6 * * *"
   workflow_dispatch:
     inputs:
       version:
