@@ -11,8 +11,8 @@
 class LibreWebui < Formula
   desc "Open, self-hosted workspace for creating with AI"
   homepage "https://librewebui.org/"
-  url "https://registry.npmjs.org/libre-webui/-/libre-webui-0.34.0.tgz"
-  sha256 "45a8224145a91ef1081562fd98059b69cd9edadc3e7ff17955d6e6bf23b907f7"
+  url "https://registry.npmjs.org/libre-webui/-/libre-webui-0.34.1.tgz"
+  sha256 "6d21ec42811543fa61411e5c4ebc444df41e2b40f8247ec66a59131667979416"
   license "Apache-2.0"
   head "https://github.com/libre-webui/libre-webui.git", branch: "main"
 
