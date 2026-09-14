@@ -15,8 +15,7 @@ cask "libre-webui-desktop" do
   # Releases up to 0.26.0 predate the rename to "Libre WebUI Desktop" and
   # ship assets under the old "Frontend" name; the hourly updater rewrites
   # the download and app stanzas to match whatever the release contains.
-  url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Desktop-#{version}-mac-arm64.dmg",
-      verified: "github.com/libre-webui/libre-webui/"
+  url "https://github.com/libre-webui/libre-webui/releases/download/v#{version}/Libre-WebUI-Desktop-#{version}-mac-arm64.dmg"
   name "Libre WebUI Desktop"
   desc "Open, self-hosted workspace for creating with AI"
   homepage "https://librewebui.org/"
