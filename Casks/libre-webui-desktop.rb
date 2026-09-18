@@ -9,8 +9,8 @@
 #   brew install --cask libre-webui/tap/libre-webui-desktop
 
 cask "libre-webui-desktop" do
-  version "0.35.0"
-  sha256 "ca7d70d9f68e1acd630851216f752386fb61c034fbecc0be5bb7bae9dfe1f38e"
+  version "0.36.0"
+  sha256 "a45056668b32fff1395f1cb66830b503ae65233bb6a7bfe1dd8023e782b58f35"
 
   # Releases up to 0.26.0 predate the rename to "Libre WebUI Desktop" and
   # ship assets under the old "Frontend" name; the hourly updater rewrites
