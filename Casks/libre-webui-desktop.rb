@@ -10,7 +10,7 @@
 
 cask "libre-webui-desktop" do
   version "0.42.0"
-  sha256 "2d1d155611e9aaba781946e85796ab1e3c03afb1101e0a6e2bca168546bceb34"
+  sha256 "eda752332207b70413948bfffe8bee860839a14216d9a041286e5b532931e2f1"
 
   # Releases up to 0.26.0 predate the rename to "Libre WebUI Desktop" and
   # ship assets under the old "Frontend" name; the hourly updater rewrites
